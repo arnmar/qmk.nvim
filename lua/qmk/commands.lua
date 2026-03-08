@@ -45,6 +45,57 @@ local function cmd_open_qf()
   vim.cmd("copen")
 end
 
+-- Show history menu: pick a previous keyboard/keymap and compile it.
+local function cmd_history()
+  local cache = require("qmk.cache")
+  local history = cache.history()
+
+  if #history == 0 then
+    vim.notify("[qmk] No compile history yet", vim.log.levels.WARN)
+    return
+  end
+
+  -- Build display labels
+  local items = {}
+  for i, entry in ipairs(history) do
+    local prefix = i == 1 and "★ " or "  "
+    table.insert(items, {
+      label   = string.format("%s%s  [%s]", prefix, entry.keyboard, entry.keymap),
+      keyboard = entry.keyboard,
+      keymap   = entry.keymap,
+    })
+  end
+
+  -- Append a "Clear history" option at the bottom
+  table.insert(items, { label = "✕  Clear history", clear = true })
+
+  vim.ui.select(items, {
+    prompt = "QMK › Recent keyboards:",
+    format_item = function(item) return item.label end,
+  }, function(choice)
+    if not choice then return end
+
+    if choice.clear then
+      -- Wipe history by saving current entry only (or nothing)
+      local cfg = get_cfg()
+      local data_path = vim.fn.stdpath("data") .. "/qmk_nvim_cache.json"
+      local f = io.open(data_path, "w")
+      if f then
+        f:write(vim.fn.json_encode({
+          keyboard = cfg.keyboard,
+          keymap   = cfg.keymap,
+          history  = {},
+        }))
+        f:close()
+      end
+      vim.notify("[qmk] History cleared", vim.log.levels.INFO)
+      return
+    end
+
+    do_compile(choice.keyboard, choice.keymap)
+  end)
+end
+
 function M.register()
   vim.api.nvim_create_user_command("QMKCompile", cmd_compile, {
     desc = "Compile the current QMK keyboard/keymap",
@@ -52,6 +103,10 @@ function M.register()
 
   vim.api.nvim_create_user_command("QMKCompileSelect", cmd_compile_select, {
     desc = "Pick keyboard+keymap interactively, then compile",
+  })
+
+  vim.api.nvim_create_user_command("QMKHistory", cmd_history, {
+    desc = "Pick from recently compiled keyboards and compile",
   })
 
   vim.api.nvim_create_user_command("QMKOpenQF", cmd_open_qf, {

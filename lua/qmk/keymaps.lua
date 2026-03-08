@@ -14,6 +14,11 @@ function M.register(maps)
       vim.tbl_extend("force", opts, { desc = "QMK: Select & Compile" }))
   end
 
+  if maps.history then
+    vim.keymap.set("n", maps.history, "<cmd>QMKHistory<cr>",
+      vim.tbl_extend("force", opts, { desc = "QMK: History" }))
+  end
+
   if maps.open_qf then
     vim.keymap.set("n", maps.open_qf, "<cmd>QMKOpenQF<cr>",
       vim.tbl_extend("force", opts, { desc = "QMK: Open Quickfix" }))
