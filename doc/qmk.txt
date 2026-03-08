@@ -1,0 +1,74 @@
+*qmk.txt*  Compile QMK firmware from Neovim
+
+==============================================================================
+CONTENTS                                                          *qmk-contents*
+
+  1. Introduction ................................ |qmk-intro|
+  2. Setup ....................................... |qmk-setup|
+  3. Commands .................................... |qmk-commands|
+  4. Key mappings ................................ |qmk-keymaps|
+  5. Configuration ............................... |qmk-config|
+
+==============================================================================
+1. INTRODUCTION                                                     *qmk-intro*
+
+qmk.nvim lets you compile QMK keyboard firmware without leaving Neovim.
+Errors and warnings are parsed into the quickfix list so you can jump
+directly to the offending source line.
+
+==============================================================================
+2. SETUP                                                            *qmk-setup*
+
+Minimal: >lua
+  require("qmk").setup()
+<
+
+With options: >lua
+  require("qmk").setup({
+    qmk_path = "~/qmk_firmware",
+    keyboard = "crkbd",
+    keymap   = "default",
+  })
+<
+
+==============================================================================
+3. COMMANDS                                                      *qmk-commands*
+
+:QMKCompile                                                      *:QMKCompile*
+  Compile using the current (or last-used) keyboard and keymap.
+  If no keyboard/keymap is set, opens the interactive selector.
+
+:QMKCompileSelect                                          *:QMKCompileSelect*
+  Open the interactive keyboard → keymap picker, then compile.
+  Previously used keyboard/keymap appears at the top of the list (★).
+
+:QMKOpenQF                                                        *:QMKOpenQF*
+  Re-open the quickfix window showing the last compile output.
+
+==============================================================================
+4. KEY MAPPINGS                                                  *qmk-keymaps*
+
+Default mappings (can be overridden in setup):
+
+  <leader>qc   →  :QMKCompile
+  <leader>qs   →  :QMKCompileSelect
+  <leader>qq   →  :QMKOpenQF
+
+Disable a mapping by setting it to false: >lua
+  require("qmk").setup({
+    keymaps = { open_qf = false },
+  })
+<
+
+==============================================================================
+5. CONFIGURATION                                                   *qmk-config*
+
+  qmk_path      (string)   Path to QMK firmware. Default: "~/qmk_firmware"
+  keyboard      (string)   Pre-selected keyboard slug. Default: nil
+  keymap        (string)   Pre-selected keymap name. Default: nil
+  make_jobs     (number)   Parallel jobs. 0 = all CPU cores. Default: 0
+  auto_open_qf  (boolean)  Open quickfix after compile. Default: true
+  keymaps       (table)    Key binding overrides. See |qmk-keymaps|.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
