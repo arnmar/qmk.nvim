@@ -17,6 +17,17 @@ local function do_compile(keyboard, keymap)
   require("qmk.compile").run(keyboard, keymap, cfg)
 end
 
+local function do_compile_db(keyboard, keymap)
+  local cfg = get_cfg()
+  local cache = require("qmk.cache")
+
+  cfg.keyboard = keyboard
+  cfg.keymap   = keymap
+  cache.save(keyboard, keymap)
+
+  require("qmk.compile").gen_compile_db(keyboard, keymap, cfg)
+end
+
 -- Compile using the last-known (or config-set) keyboard/keymap.
 -- If none is stored, fall through to interactive selection.
 local function cmd_compile()
@@ -38,6 +49,17 @@ function cmd_compile_select()
     cfg.keymap,
     do_compile
   )
+end
+
+-- Generate compile_commands.json using last-known keyboard/keymap.
+local function cmd_compile_db()
+  local cfg = get_cfg()
+  if cfg.keyboard and cfg.keymap then
+    do_compile_db(cfg.keyboard, cfg.keymap)
+  else
+    vim.notify("[qmk] No keyboard/keymap set — opening selector", vim.log.levels.WARN)
+    require("qmk.selector").pick(cfg.qmk_path, cfg.keyboard, cfg.keymap, do_compile_db)
+  end
 end
 
 -- Re-open the quickfix window.
@@ -111,6 +133,10 @@ function M.register()
 
   vim.api.nvim_create_user_command("QMKOpenQF", cmd_open_qf, {
     desc = "Open the QMK quickfix window",
+  })
+
+  vim.api.nvim_create_user_command("QMKCompileDB", cmd_compile_db, {
+    desc = "Generate compile_commands.json for the current keyboard/keymap",
   })
 end
 

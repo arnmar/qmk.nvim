@@ -18,6 +18,7 @@ M.config = {
   keymaps = {
     compile        = "<leader>qc",
     compile_select = "<leader>qs",
+    compile_db     = "<leader>qd",
     history        = "<leader>qh",
     open_qf        = "<leader>qq",
   },

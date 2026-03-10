@@ -14,6 +14,11 @@ function M.register(maps)
       vim.tbl_extend("force", opts, { desc = "QMK: Select & Compile" }))
   end
 
+  if maps.compile_db then
+    vim.keymap.set("n", maps.compile_db, "<cmd>QMKCompileDB<cr>",
+      vim.tbl_extend("force", opts, { desc = "QMK: Generate compile_commands.json" }))
+  end
+
   if maps.history then
     vim.keymap.set("n", maps.history, "<cmd>QMKHistory<cr>",
       vim.tbl_extend("force", opts, { desc = "QMK: History" }))

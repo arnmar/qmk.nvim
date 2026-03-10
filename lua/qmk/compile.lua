@@ -148,4 +148,59 @@ function M.run(keyboard, keymap, cfg)
   end
 end
 
+--- Generate compile_commands.json via qmk compile --compiledb
+---@param keyboard string
+---@param keymap string
+---@param cfg table
+function M.gen_compile_db(keyboard, keymap, cfg)
+  local qmk_path = cfg.qmk_path
+
+  if vim.fn.isdirectory(qmk_path) == 0 then
+    notify("QMK path not found: " .. qmk_path, vim.log.levels.ERROR)
+    return
+  end
+
+  local target = keyboard .. ":" .. keymap
+  local cmd = string.format(
+    "cd %s && qmk compile --compiledb -kb %s -km %s 2>&1",
+    vim.fn.shellescape(qmk_path),
+    vim.fn.shellescape(keyboard),
+    vim.fn.shellescape(keymap)
+  )
+
+  notify(string.format("Generating compile_commands.json for %s …", target))
+
+  local output_lines = {}
+  vim.fn.jobstart(cmd, {
+    stdout_buffered = false,
+    stderr_buffered = false,
+
+    on_stdout = function(_, data)
+      if not data then return end
+      for _, line in ipairs(data) do
+        if line ~= "" then table.insert(output_lines, line) end
+      end
+    end,
+
+    on_stderr = function(_, data)
+      if not data then return end
+      for _, line in ipairs(data) do
+        if line ~= "" then table.insert(output_lines, line) end
+      end
+    end,
+
+    on_exit = function(_, exit_code)
+      if exit_code == 0 then
+        notify(string.format("✓ compile_commands.json generated for %s", target))
+      else
+        notify(
+          string.format("✗ Failed to generate compile_commands.json for %s\n%s",
+            target, table.concat(output_lines, "\n")),
+          vim.log.levels.ERROR
+        )
+      end
+    end,
+  })
+end
+
 return M
