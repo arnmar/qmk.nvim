@@ -16,10 +16,10 @@ M.config = {
   make_jobs = 0,
   auto_open_qf = true,
   keymaps = {
-    compile        = "<leader>qc",
-    compile_select = "<leader>qS",
-    compile_db     = "<leader>qD",
-    history        = "<leader>qh",
+    compile        = "<leader>Qc",
+    compile_select = "<leader>Qs",
+    compile_db     = "<leader>Qd",
+    history        = "<leader>Qh",
   },
 }
 
