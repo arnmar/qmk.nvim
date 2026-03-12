@@ -17,10 +17,9 @@ M.config = {
   auto_open_qf = true,
   keymaps = {
     compile        = "<leader>qc",
-    compile_select = "<leader>qs",
-    compile_db     = "<leader>qd",
+    compile_select = "<leader>qS",
+    compile_db     = "<leader>qD",
     history        = "<leader>qh",
-    open_qf        = "<leader>qq",
   },
 }
 
